@@ -28,12 +28,21 @@ app.post('/login', jsonParser, function (req, res) {
     return res.end(JSON.stringify({ 'status': 'ok' }));
 })
 
+app.get('/mostrar_todo', jsonParser, function (req, res){
+    db.serialize(() => {
+        db.each("SELECT * from todos", (err, row) => {            
+            return res.status("201").end(JSON.stringify({'result':row}))
+        });
+    });
+})
+
+
 app.post('/agregar_todo', jsonParser, function (req, res){
-     
+    console.log(req.body)
     db.serialize(() => {
         db.run("insert into todos (todos,created_at)values(?,?)",[req.body.todos,req.body.created_at],(err)=>{
             if (err) {
-                return console.error('Error al insertar datos:', err.message);
+                return res.status("401").end(err.message);
               }              
               //res.end('Datos guardados correctamente');
         })
@@ -52,5 +61,5 @@ app.post('/agregar_todo', jsonParser, function (req, res){
 const port = 3001;
 
 app.listen(port, () => {
-    console.log("Aplicación corriendo en http://localhost:${port}")
+    console.log(`Aplicación corriendo en http://localhost:${port}`)
 })
