@@ -30,8 +30,13 @@ app.post('/login', jsonParser, function (req, res) {
 
 app.get('/mostrar_todo', jsonParser, function (req, res){
     db.serialize(() => {
-        db.each("SELECT * from todos", (err, row) => {            
-            return res.status("201").end(JSON.stringify({'result':row}))
+        db.each("SELECT * from todos", (err, row) => {         
+            if(row){
+                return res.status("201").json({"result":row})
+            }else{
+                return res.status("404").json({"result":"error"})
+            }   
+            
         });
     });
 })
